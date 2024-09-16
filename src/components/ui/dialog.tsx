@@ -32,7 +32,7 @@ export function DialogContent(props: DialogPrimitive.DialogContentProps) {
 
       <DialogPrimitive.DialogContent
         {...props}
-        className="fixed z-50 right-0 top-0 bottom-0 w-[400px] h-screen border-l border-zinc-900 bg-zinc-950 p-8"
+        className="fixed bottom-0 right-0 top-0 z-50 h-screen w-[400px] border-l border-zinc-900 bg-zinc-950 p-8"
       />
     </DialogPortal>
   )
@@ -45,12 +45,12 @@ export function DialogTitle(props: DialogPrimitive.DialogTitleProps) {
 }
 
 export function DialogDescription(
-  props: DialogPrimitive.DialogDescriptionProps
+  props: DialogPrimitive.DialogDescriptionProps,
 ) {
   return (
     <DialogPrimitive.DialogDescription
       {...props}
-      className="text-zinc-400 text-sm leading-relaxed"
+      className="text-sm leading-relaxed text-zinc-400"
     />
   )
 }
