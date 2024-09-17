@@ -2,22 +2,20 @@
 
 import { sql } from '@vercel/postgres'
 
-export async function ClienteInsertBD({
-  nome_estabelecimento,
-  receita_total,
-  numero_pedidos,
-  numero_cancelamentos,
+export async function CreateGoal({
   id,
+  title,
+  date,
+  frequency,
 }: {
-  nome_estabelecimento: string
-  receita_total: string
-  numero_pedidos: string
-  numero_cancelamentos: string
   id: number
+  title: string
+  date: string
+  frequency: number
 }) {
   try {
     console.log('Enviando dados para o banco de dados...')
-    await sql`INSERT INTO pizza_shop_cliente (nome_estabelecimento, receita_total, numero_pedidos, numero_cancelamentos, id) VALUES (${nome_estabelecimento}, ${receita_total}, ${numero_pedidos}, ${numero_cancelamentos}, ${id})`
+    await sql`INSERT INTO inorbit_goals (id, title, date, frequency) VALUES (${id}, ${title}, ${date}, ${frequency})`
     console.log('Enviado com sucesso!')
   } catch (error) {
     console.log(error)
