@@ -18,6 +18,17 @@ export default function Home() {
     setData((prev) => ({ ...prev, [key]: value }))
   }
 
+  const handlerCreateGoal = async () => {
+    const frequency = parseInt(data.title, 10);
+
+    await CreateGoal({
+      id: 1,
+      title: data.title,
+      date: "teste",
+      frequency: frequency,
+    });
+  }
+
   return (
     <div className="min-h-screen">
       <Dialog>
