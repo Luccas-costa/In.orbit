@@ -17,13 +17,19 @@ import { DataCreateType } from '@/types/dataCreate'
 
 interface CreateGoalProps {
   dataCreate: DataCreateType
-  handlerUpdateData: (key: string, value: string) => void
+  handlerUpdateData: (key: string, value: string | number) => void
+  handlerCreateGoal: () => void
 }
 
-export function CreateGoal({ dataCreate, handlerUpdateData }: CreateGoalProps) {
+export function CreateGoal({
+  dataCreate,
+  handlerUpdateData,
+  handlerCreateGoal,
+}: CreateGoalProps) {
   const handlerUpdateFrequency = (value: string) => {
-    handlerUpdateData('frequency', value)
+    handlerUpdateData('frequency', parseInt(value, 10)) // Convertendo para número
   }
+
   return (
     <DialogContent>
       <div className="flex h-full flex-col gap-6">
@@ -47,13 +53,14 @@ export function CreateGoal({ dataCreate, handlerUpdateData }: CreateGoalProps) {
               <Input
                 id="title"
                 autoFocus
-                placeholder="Praticar exercicios, meditar, etc..,"
+                placeholder="Praticar exercícios, meditar, etc..,"
                 value={dataCreate.title || ''}
                 onChange={(e) => handlerUpdateData('title', e.target.value)}
               />
             </div>
+
             <div className="flex flex-col gap-2">
-              <Label htmlFor="title">Quantas vezes na semana?</Label>
+              <Label htmlFor="frequency">Quantas vezes na semana?</Label>
               <RadioGroup>
                 <RadioGroupItem
                   value="1"
@@ -90,7 +97,7 @@ export function CreateGoal({ dataCreate, handlerUpdateData }: CreateGoalProps) {
 
                 <RadioGroupItem
                   value="4"
-                  onClick={() => handlerUpdateFrequency('5')}
+                  onClick={() => handlerUpdateFrequency('4')} // Corrigido valor repetido
                 >
                   <RadioGroupIndicator />
                   <span className="text-sm font-medium leading-none text-zinc-300">
@@ -101,7 +108,7 @@ export function CreateGoal({ dataCreate, handlerUpdateData }: CreateGoalProps) {
 
                 <RadioGroupItem
                   value="5"
-                  onClick={() => handlerUpdateFrequency('6')}
+                  onClick={() => handlerUpdateFrequency('5')} // Corrigido valor repetido
                 >
                   <RadioGroupIndicator />
                   <span className="text-sm font-medium leading-none text-zinc-300">
@@ -141,7 +148,8 @@ export function CreateGoal({ dataCreate, handlerUpdateData }: CreateGoalProps) {
                 Fechar
               </Button>
             </DialogClose>
-            <Button className="flex-1">Salvar</Button>
+            <Button className="flex-1" onClick={handlerCreateGoal}>Salvar</Button>
+            <div onClick={handlerCreateGoal}>tes</div>
           </div>
         </form>
       </div>
