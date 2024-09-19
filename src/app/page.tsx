@@ -12,9 +12,10 @@ import { Summary } from '@/components/summary'
 import { Dialog } from '@/components/ui/dialog'
 import { CreateGoal } from '../components/create-goal'
 import Loader from '../assets/loading'
+import { CompletedGoal } from '@/lib/completed-goal'
 
 export default function Home() {
-  const [, setGoals] = useState<GoalType[]>([]) // Definindo o tipo conforme sua função
+  const [goals, setGoals] = useState<GoalType[]>([]) // Definindo o tipo conforme sua função
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<boolean>(false)
 
@@ -54,22 +55,37 @@ export default function Home() {
       return
     }
 
-    const frequency = data.frequency // Atribuir frequency direto de data
     const randomId = Math.floor(10000 + Math.random() * 90000)
+    const frequency = data.frequency // Atribuir frequency direto de data
     const date = getFormattedDate()
 
     await CreateGoaldb({
       id: randomId || 1,
-      title: data.title || 'n foi',
-      date: date || 'nao foi',
+      title: data.title || 'Não funcionou',
+      date: date || 'Não funcionou',
       frequency: frequency || 1,
     })
+  }
+
+  const handlerCompletedGoal = async (id: number) => {
+    const date = getFormattedDate()
+    await CompletedGoal({
+      idGoal: id,
+      dateCompleted: date,
+    })
+    console.log('Meta concluída com sucesso!')
   }
 
   return (
     <div className="min-h-screen">
       <Dialog>
-        {loading ? <Loader /> : error ? <EmptyGoals /> : <Summary />}
+        {loading ? (
+          <Loader />
+        ) : error ? (
+          <EmptyGoals />
+        ) : (
+          <Summary goals={goals} handlerCompletedGoal={handlerCompletedGoal} />
+        )}
         <CreateGoal
           dataCreate={data}
           handlerUpdateData={handlerUpdateData}

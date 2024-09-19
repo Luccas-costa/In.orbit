@@ -6,7 +6,12 @@ import { Progress, ProgressIndicator } from './ui/progress-bar'
 import { Separator } from './ui/separator'
 import { OutlineButton } from './ui/outline-button'
 
-export function Summary() {
+interface SummaryProps {
+  goals: { title: string; id: number }[]
+  handlerCompletedGoal: (id: number) => void
+}
+
+export function Summary({ goals, handlerCompletedGoal }: SummaryProps) {
   return (
     <div className="mx-auto flex max-w-[480px] flex-col gap-6 px-5 py-10">
       <div className="flex items-center justify-between">
@@ -30,8 +35,9 @@ export function Summary() {
 
         <div className="flex items-center justify-between text-xs text-zinc-400">
           <span>
-            Você completou <span className="text-zinc-100">8</span> de{' '}
-            <span className="text-zinc-100">15</span> metas nessa semana.
+            Você completou <span className="text-zinc-100">0</span> de{' '}
+            <span className="text-zinc-100">{goals.length}</span> metas nessa
+            semana.
           </span>
           <span>50%</span>
         </div>
@@ -40,22 +46,15 @@ export function Summary() {
       <Separator />
 
       <div className="flex flex-wrap gap-3">
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-600" />
-          Meditar
-        </OutlineButton>
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-600" />
-          Nadar
-        </OutlineButton>
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-600" />
-          Praticar exercicios
-        </OutlineButton>
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-600" />
-          Me alimentar bem
-        </OutlineButton>
+        {goals.map((goal) => (
+          <OutlineButton
+            key={goal.id}
+            onClick={() => handlerCompletedGoal(goal.id)}
+          >
+            <Plus className="size-4 text-zinc-600" />
+            {goal.title}
+          </OutlineButton>
+        ))}
       </div>
 
       <div className="flex flex-col gap-6">
