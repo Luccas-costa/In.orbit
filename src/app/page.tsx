@@ -11,7 +11,7 @@ import { EmptyGoals } from '@/components/empty-goals'
 import { Summary } from '@/components/summary'
 import { Dialog } from '@/components/ui/dialog'
 import { CreateGoal } from '../components/create-goal'
-import { Loader } from 'lucide-react'
+import Loader from '../assets/loading'
 
 export default function Home() {
   const [, setGoals] = useState<GoalType[]>([]) // Definindo o tipo conforme sua função
