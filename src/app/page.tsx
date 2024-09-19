@@ -1,13 +1,40 @@
 'use client'
-import React, { useState } from 'react'
-import { CreateGoal } from '../lib/create-goal'
-// import { EmptyGoals } from '@/components/empty-goals'
+import React, { useState, useEffect } from 'react'
+
+import dayjs from 'dayjs'
+import { GoalType } from '@/types/goal'
+import { SearchGoals } from '../lib/search-goal'
+import { DataCreateType } from '@/types/dataCreate'
+import { CreateGoal as CreateGoaldb } from '../lib/create-goal'
+
+import { EmptyGoals } from '@/components/empty-goals'
 import { Summary } from '@/components/summary'
 import { Dialog } from '@/components/ui/dialog'
-import dayjs from 'dayjs'
-import { DataCreateType } from '@/types/dataCreate'
+import { CreateGoal } from '../components/create-goal'
+import { Loader } from 'lucide-react'
 
 export default function Home() {
+  const [, setGoals] = useState<GoalType[]>([]) // Definindo o tipo conforme sua função
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<boolean>(false)
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      setLoading(true)
+      try {
+        const data = await SearchGoals() // Chama a função SearchGoals
+        setGoals(data) // Armazena os dados no estado
+      } catch (err) {
+        console.error('Erro ao buscar objetivos:', err)
+        setError(false)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchGoals() // Chama a função ao montar o componente
+  }, [])
+
   const dataCreate = {
     title: '',
     frequency: 0, // Garantir que frequency seja inicializado corretamente
@@ -31,9 +58,9 @@ export default function Home() {
     const randomId = Math.floor(10000 + Math.random() * 90000)
     const date = getFormattedDate()
 
-    await CreateGoal({
+    await CreateGoaldb({
       id: randomId || 1,
-      title: data.title || "n foi",
+      title: data.title || 'n foi',
       date: date || 'nao foi',
       frequency: frequency || 1,
     })
@@ -42,7 +69,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Dialog>
-        <Summary />
+        {loading ? <Loader /> : error ? <EmptyGoals /> : <Summary />}
         <CreateGoal
           dataCreate={data}
           handlerUpdateData={handlerUpdateData}

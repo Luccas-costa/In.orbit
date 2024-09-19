@@ -148,8 +148,9 @@ export function CreateGoal({
                 Fechar
               </Button>
             </DialogClose>
-            <Button className="flex-1" onClick={handlerCreateGoal}>Salvar</Button>
-            <div onClick={handlerCreateGoal}>tes</div>
+            <Button className="flex-1" onClick={handlerCreateGoal}>
+              Salvar
+            </Button>
           </div>
         </form>
       </div>

@@ -13,7 +13,12 @@ export async function CreateGoal({
   date: string
   frequency: number
 }) {
-  if (id === undefined || title === undefined || date === undefined || frequency === undefined) {
+  if (
+    id === undefined ||
+    title === undefined ||
+    date === undefined ||
+    frequency === undefined
+  ) {
     console.log('Error: Missing required fields.')
     return
   }
