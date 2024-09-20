@@ -2,22 +2,33 @@
 import React, { useState, useEffect } from 'react'
 
 import dayjs from 'dayjs'
+
 import { GoalType } from '@/types/goal'
-import { SearchGoals } from '../lib/search-goal'
 import { DataCreateType } from '@/types/dataCreate'
+import { SummaryResult2, SummaryResultType } from '@/types/summary-result'
+
+import { SearchGoals } from '../lib/search-goal'
+import { CompletedGoal } from '@/lib/completed-goal'
 import { CreateGoal as CreateGoaldb } from '../lib/create-goal'
 
-import { EmptyGoals } from '@/components/empty-goals'
+import { Summary as Summarydb } from '@/db/summary'
+
+import Loader from '../assets/loading'
 import { Summary } from '@/components/summary'
 import { Dialog } from '@/components/ui/dialog'
+import { EmptyGoals } from '@/components/empty-goals'
 import { CreateGoal } from '../components/create-goal'
-import Loader from '../assets/loading'
-import { CompletedGoal } from '@/lib/completed-goal'
+import { SummaryGroup } from '@/db/summary-group'
 
 export default function Home() {
   const [goals, setGoals] = useState<GoalType[]>([]) // Definindo o tipo conforme sua função
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<boolean>(false)
+
+  const [completedGoals, setCompletedGoals] = useState<SummaryResultType[]>([])
+  const [completedGoalsFormated, setCompletedGoalsFormated] = useState<
+    SummaryResult2[]
+  >([])
 
   useEffect(() => {
     const fetchGoals = async () => {
@@ -28,12 +39,40 @@ export default function Home() {
       } catch (err) {
         console.error('Erro ao buscar objetivos:', err)
         setError(false)
+      }
+    }
+
+    const fetchCompletedGoals = async () => {
+      try {
+        setLoading(true)
+        const result = await Summarydb()
+        setCompletedGoals(result) // Define a lista de metas no estado
+      } catch (err) {
+        setError(true)
+        console.error(err)
       } finally {
         setLoading(false)
       }
     }
 
+    const fetchCompletedGoalsFormated = async () => {
+      try {
+        setLoading(true)
+        const result = await SummaryGroup()
+
+        // Filtra os resultados que não são nulos
+        const filteredResult = result.filter((item) => item !== null)
+
+        setCompletedGoalsFormated(filteredResult as SummaryResult2[]) // Define a lista de metas no estado
+      } catch (err) {
+        setError(true)
+        console.error(err)
+      }
+    }
+
     fetchGoals() // Chama a função ao montar o componente
+    fetchCompletedGoalsFormated()
+    fetchCompletedGoals()
   }, [])
 
   const dataCreate = {
@@ -84,7 +123,12 @@ export default function Home() {
         ) : error ? (
           <EmptyGoals />
         ) : (
-          <Summary goals={goals} handlerCompletedGoal={handlerCompletedGoal} />
+          <Summary
+            goals={goals}
+            handlerCompletedGoal={handlerCompletedGoal}
+            completedGoals={completedGoals}
+            completedGoalsFormated={completedGoalsFormated}
+          />
         )}
         <CreateGoal
           dataCreate={data}

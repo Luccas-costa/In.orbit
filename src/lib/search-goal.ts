@@ -10,7 +10,7 @@ export async function SearchGoals(): Promise<GoalType[]> {
       id: row.id,
       title: row.title,
       date: row.date,
-      frequency: row.numero_pedidos,
+      frequency: row.frequency,
     }))
     return Goals
   } catch (error) {
