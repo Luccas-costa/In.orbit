@@ -26,6 +26,8 @@ import { DeleteByIdCompletedGoal } from '@/lib/delete-byId-completed-goal'
 import { SearchByIdGoal } from '@/lib/search-byid-goal'
 import { GoalType } from '@/types/goal'
 import { updateGoalTitleAndFrequency } from '@/lib/update-goal'
+import { ManuelType } from '@/types/manuel'
+import { CreateGoaldb } from '@/lib/create-goal'
 
 // Configura o locale para português
 dayjs.locale('pt')
@@ -48,6 +50,11 @@ export function Summary({
   const [ManuelGoal, setManuelGoal] = useState(false)
   const [UpdateChosen, setUpdateChosen] = useState(false)
   const [isChosen, setIsChosen] = useState(false)
+  const [Manueldata, setManueldata] = useState<ManuelType>({
+    title: "",
+    date: "",
+    frequency: 0
+  })
   const [UpdateData, setUpdateData] = useState<GoalType>({
     id: 0,
     title: '',
@@ -75,6 +82,14 @@ export function Summary({
     setManuelGoal(false)
     setUpdateChosen(false)
     setIsDeleteGoalBtnOpen(true)
+  }
+
+  const handlerManuelReset = () => {
+    setIsChosen(false)
+    setUpdateGoal(false)
+    setManuelGoal(true)
+    setUpdateChosen(false)
+    setIsDeleteGoalBtnOpen(false)
   }
 
   const completedGoalsIds = completedGoals.map((goal) => goal.id)
@@ -153,6 +168,16 @@ export function Summary({
     })
   }
 
+  const handlerManuel = async = (title: string, date: string, frequency: number) {
+    const randomId = Math.floor(10000 + Math.random() * 90000)
+    await CreateGoaldb({
+      id: randomId,
+      title: title,
+      date: date,
+      frequency: frequency
+    })
+  }
+
   return (
     <div className="mx-auto flex max-w-[480px] flex-col gap-6 px-5 py-10 transition-all">
       <div className="flex items-center justify-between">
@@ -185,7 +210,7 @@ export function Summary({
                     Alterar uma meta
                   </Button>
                 </div>
-                <div onClick={() => setManuelGoal(true)}>
+                <div onClick={handlerManuelReset}>
                   <Button className="size-sm">
                     <BotOff className="size-4" />
                     Controle manual
@@ -203,24 +228,51 @@ export function Summary({
 
           {ManuelGoal && (
             <div className="flex flex-col gap-1">
-              <DialogTrigger asChild>
                 <Button className="size-sm">
                   <BotOff className="size-4" />
                   Controle manual
                 </Button>
-              </DialogTrigger>
-              <div className="absolute top-[90px] max-h-screen w-[132px] overflow-y-auto rounded-lg bg-zinc-900">
-                <div className="flex flex-col gap-1">
+                <div className="absolute top-[90px] max-h-screen w-[160px] overflow-y-auto rounded-lg bg-zinc-900">
+                <div className="flex flex-col gap-3 p-1">
                   <input
                     type="text"
-                    className="w-full rounded-lg bg-zinc-200/70 px-2"
-                    placeholder="Nome da meta"
+                    className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
+                    placeholder="title"
+                    onChange={(e) =>
+                      setManueldata({ ...Manueldata, title: e.target.value })
+                    }
                   />
                   <input
                     type="text"
-                    className="w-full rounded-lg bg-zinc-200/70 px-2"
+                    className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
                     placeholder="2024/09/19-14:42:16"
+                    onChange={(e) =>
+                      setManueldata({ ...Manueldata, date: e.target.value })
+                    }
                   />
+                  <input
+                    type="text"
+                    className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
+                    placeholder="frequency"
+                    onChange={(e) =>
+                      setManueldata({
+                        ...Manueldata,
+                        frequency: parseInt(e.target.value), // Converte a string para número
+                      })
+                    }
+                  />
+                  <button
+                    onClick={() =>
+                      handlerManuel(
+                        Manueldata.title,
+                        Manuel.date,
+                        Manueldata.frequency
+                      )
+                    }
+                    className="w-full rounded-lg border-none bg-purple-500/70 p-2 text-white focus:outline-none"
+                  >
+                    Alterar
+                  </button>
                 </div>
               </div>
             </div>
