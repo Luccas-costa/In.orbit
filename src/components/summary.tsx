@@ -23,14 +23,18 @@ import type { GoalType } from '@/types/goal'
 import type { ManuelType, Manuel2Type } from '@/types/manuel'
 import type { SummaryResult2 } from '@/types/summary-result'
 
-import { DeleteGoal } from '@/lib/delete-goal'
-import { CreateGoal } from '@/lib/create-goal'
 import { SearchByIdGoal } from '@/lib/search-byid-goal'
+import { SearchBytitleGoal } from '@/lib/search-bytitle-goal'
+
+import { CompletedGoal } from '@/lib/completed-goal'
+
+import { CreateGoal } from '@/lib/create-goal'
+
 import { updateGoalTitleAndFrequency } from '@/lib/update-goal'
+
+import { DeleteGoal } from '@/lib/delete-goal'
 import { DeleteCompletedGoal } from '@/lib/delete-completed-goal'
 import { DeleteByIdCompletedGoal } from '@/lib/delete-byId-completed-goal'
-import { CompletedGoal } from '@/lib/completed-goal'
-import { SearchBytitleGoal } from '@/lib/search-bytitle-goal'
 
 // Configura o locale para português
 dayjs.locale('pt')
@@ -40,6 +44,7 @@ interface SummaryProps {
   handlerCompletedGoal: (id: number) => void
   completedGoals: { title: string; id: number }[]
   completedGoalsFormated: SummaryResult2[]
+  handlerrefresh: (value: boolean) => void
 }
 
 export function Summary({
@@ -47,6 +52,7 @@ export function Summary({
   handlerCompletedGoal,
   completedGoals,
   completedGoalsFormated,
+  handlerrefresh,
 }: SummaryProps) {
   const [isDeleteGoalBtnOpen, setIsDeleteGoalBtnOpen] = useState(false)
   const [UpdateGoal, setUpdateGoal] = useState(false)
@@ -143,6 +149,7 @@ export function Summary({
       dateCompleted: date,
     })
     console.log('Meta excluída com sucesso!')
+    handlerrefresh(true)
   }
 
   const handlerDeleteGoalById = async (idGoal: number) => {
@@ -151,6 +158,7 @@ export function Summary({
     await DeleteGoal({ id })
     console.log('Metas excluída com sucesso!')
     setIsDeleteGoalBtnOpen(false)
+    handlerrefresh(true)
   }
 
   const handlerUpdate = async (goalid: number) => {
@@ -187,6 +195,7 @@ export function Summary({
       date: '',
       frequency: 0,
     })
+    handlerrefresh(true)
   }
 
   const handlerManuel = async (
@@ -203,6 +212,7 @@ export function Summary({
     })
     setManuelGoal(false)
     setManuelGoal2(false)
+    handlerrefresh(true)
   }
 
   const handlerManuel2 = async (title: string, date: string) => {
@@ -235,6 +245,7 @@ export function Summary({
     setManuelGoal(false)
     setManuelGoal2(false)
     setManuelGoal3(false)
+    handlerrefresh(true)
   }
 
   const handlerManuelOption1 = () => {
@@ -531,7 +542,7 @@ export function Summary({
 
       <div className="flex flex-col gap-6">
         <h2 className="text-xl font-medium">Sua semana</h2>
-        <div className="flex max-h-[350px] flex-col gap-6 overflow-y-auto">
+        <div className="flex max-h-[600px] flex-col gap-6 overflow-y-auto">
           {Object.keys(completedByDay).map((day) => (
             <div key={day}>
               <div className="mb-2 flex items-center space-x-2">

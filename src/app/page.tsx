@@ -22,6 +22,7 @@ import { SummaryGroup } from '@/db/summary-group'
 
 export default function Home() {
   const [goals, setGoals] = useState<GoalType[]>([]) // Definindo o tipo conforme sua função
+  const [Refresh, setRefresh] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<boolean>(false)
 
@@ -73,7 +74,7 @@ export default function Home() {
     fetchGoals() // Chama a função ao montar o componente
     fetchCompletedGoalsFormated()
     fetchCompletedGoals()
-  }, [])
+  }, [Refresh])
 
   const dataCreate = {
     title: '',
@@ -104,6 +105,7 @@ export default function Home() {
       date: date || 'Não funcionou',
       frequency: frequency || 1,
     })
+    handlerrefresh(true)
   }
 
   const handlerCompletedGoal = async (id: number) => {
@@ -112,7 +114,17 @@ export default function Home() {
       idGoal: id,
       dateCompleted: date,
     })
+    handlerrefresh(true)
     console.log('Meta concluída com sucesso!')
+  }
+
+  const handlerrefresh = (
+    estado: boolean | ((prevState: boolean) => boolean),
+  ) => {
+    if (Refresh === false) {
+      setRefresh(true)
+    }
+    setRefresh(estado)
   }
 
   return (
@@ -128,6 +140,7 @@ export default function Home() {
             handlerCompletedGoal={handlerCompletedGoal}
             completedGoals={completedGoals}
             completedGoalsFormated={completedGoalsFormated}
+            handlerrefresh={handlerrefresh}
           />
         )}
         <CreateGoal
