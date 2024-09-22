@@ -9,6 +9,7 @@ import {
   Trash2,
   CircleDotDashed,
   BotOff,
+  Component,
 } from 'lucide-react'
 
 import { Button } from './ui/button'
@@ -18,16 +19,18 @@ import { InOrbitIcon } from './in-orbit-icon'
 import { OutlineButton } from './ui/outline-button'
 import { Progress, ProgressIndicator } from './ui/progress-bar'
 
-import { SummaryResult2 } from '@/types/summary-result'
+import type { GoalType } from '@/types/goal'
+import type { ManuelType, Manuel2Type } from '@/types/manuel'
+import type { SummaryResult2 } from '@/types/summary-result'
 
 import { DeleteGoal } from '@/lib/delete-goal'
+import { CreateGoal } from '@/lib/create-goal'
+import { SearchByIdGoal } from '@/lib/search-byid-goal'
+import { updateGoalTitleAndFrequency } from '@/lib/update-goal'
 import { DeleteCompletedGoal } from '@/lib/delete-completed-goal'
 import { DeleteByIdCompletedGoal } from '@/lib/delete-byId-completed-goal'
-import { SearchByIdGoal } from '@/lib/search-byid-goal'
-import { GoalType } from '@/types/goal'
-import { updateGoalTitleAndFrequency } from '@/lib/update-goal'
-import { ManuelType } from '@/types/manuel'
-import { CreateGoaldb } from '@/lib/create-goal'
+import { CompletedGoal } from '@/lib/completed-goal'
+import { SearchBytitleGoal } from '@/lib/search-bytitle-goal'
 
 // Configura o locale para português
 dayjs.locale('pt')
@@ -48,12 +51,24 @@ export function Summary({
   const [isDeleteGoalBtnOpen, setIsDeleteGoalBtnOpen] = useState(false)
   const [UpdateGoal, setUpdateGoal] = useState(false)
   const [ManuelGoal, setManuelGoal] = useState(false)
+  const [ManuelGoal3, setManuelGoal3] = useState(false)
+  const [ManuelGoal2, setManuelGoal2] = useState(false)
   const [UpdateChosen, setUpdateChosen] = useState(false)
   const [isChosen, setIsChosen] = useState(false)
   const [Manueldata, setManueldata] = useState<ManuelType>({
-    title: "",
-    date: "",
-    frequency: 0
+    title: '',
+    date: '',
+    frequency: 0,
+  })
+  const [Manueldata2, setManueldata2] = useState<Manuel2Type>({
+    title: '',
+    date: '',
+  })
+  const [DataGoalManuel2, setDataGoalManuel2] = useState<GoalType>({
+    id: 0,
+    title: '',
+    date: '',
+    frequency: 0,
   })
   const [UpdateData, setUpdateData] = useState<GoalType>({
     id: 0,
@@ -72,7 +87,9 @@ export function Summary({
     setIsChosen(!isChosen)
     setIsDeleteGoalBtnOpen(false)
     setUpdateGoal(false)
-    setManuelGoal(false)
+    setManuelGoal2(false)
+    setManuelGoal3(false)
+    setManuelGoal2(false)
     setUpdateChosen(false)
   }
 
@@ -80,6 +97,7 @@ export function Summary({
     setIsChosen(false)
     setUpdateGoal(false)
     setManuelGoal(false)
+    setManuelGoal2(false)
     setUpdateChosen(false)
     setIsDeleteGoalBtnOpen(true)
   }
@@ -88,6 +106,7 @@ export function Summary({
     setIsChosen(false)
     setUpdateGoal(false)
     setManuelGoal(true)
+    setManuelGoal2(false)
     setUpdateChosen(false)
     setIsDeleteGoalBtnOpen(false)
   }
@@ -131,6 +150,7 @@ export function Summary({
     await DeleteByIdCompletedGoal({ idGoal })
     await DeleteGoal({ id })
     console.log('Metas excluída com sucesso!')
+    setIsDeleteGoalBtnOpen(false)
   }
 
   const handlerUpdate = async (goalid: number) => {
@@ -160,6 +180,7 @@ export function Summary({
     setUpdateChosen(false)
     setUpdateGoal(false)
     setManuelGoal(false)
+    setManuelGoal2(false)
     setUpdateData({
       id: 0,
       title: '',
@@ -168,14 +189,63 @@ export function Summary({
     })
   }
 
-  const handlerManuel = async = (title: string, date: string, frequency: number) {
+  const handlerManuel = async (
+    title: string,
+    date: string,
+    frequency: number,
+  ) => {
     const randomId = Math.floor(10000 + Math.random() * 90000)
-    await CreateGoaldb({
+    await CreateGoal({
       id: randomId,
-      title: title,
-      date: date,
-      frequency: frequency
+      title,
+      date,
+      frequency,
     })
+    setManuelGoal(false)
+    setManuelGoal2(false)
+  }
+
+  const handlerManuel2 = async (title: string, date: string) => {
+    console.log(Manueldata2)
+    console.log(title)
+    console.log(date)
+    try {
+      const goal = await SearchBytitleGoal(title) // Chamada da função
+
+      if (goal) {
+        setDataGoalManuel2(goal) // Armazena o objetivo no estado
+        console.log('Goal encontrado:', goal)
+      } else {
+        console.log('Nenhum objetivo encontrado com esse ID.')
+      }
+    } catch (error) {
+      console.error('Erro ao buscar o objetivo:', error)
+    }
+    console.log(DataGoalManuel2)
+    console.log({
+      idGoal: DataGoalManuel2.id,
+      dateCompleted: Manueldata2.date,
+      dateCompleted2: date,
+    })
+    await CompletedGoal({
+      idGoal: DataGoalManuel2.id,
+      dateCompleted: date,
+    })
+
+    setManuelGoal(false)
+    setManuelGoal2(false)
+    setManuelGoal3(false)
+  }
+
+  const handlerManuelOption1 = () => {
+    setManuelGoal(false)
+    setManuelGoal2(true)
+    setManuelGoal3(false)
+  }
+  const handlerManuelOption2 = () => {
+    setManuelGoal(false)
+    setManuelGoal2(false)
+    setManuelGoal3(true)
   }
 
   return (
@@ -193,180 +263,218 @@ export function Summary({
           >
             <ChevronRight className="size-6 text-zinc-600" />
           </div>
-          {isChosen && (
+          {isChosen ? (
             <div className="flex flex-col gap-2">
               <div>
-                <DialogTrigger asChild>
-                  <Button className="size-sm px-2">
-                    <Plus className="size-4" />
-                    Cadastrar meta
-                  </Button>
-                </DialogTrigger>
+                <Button
+                  className="size-sm w-[130px]"
+                  onClick={handlerChosenReset}
+                >
+                  <Component className="size-4" />
+                  Opções
+                </Button>
               </div>
               <div className="absolute top-[90px] flex flex-col gap-2 bg-zinc-950">
+                <div>
+                  <DialogTrigger asChild onClick={handlerChosenReset}>
+                    <Button className="size-sm h-[40px] w-[130px] px-2 text-xs">
+                      <Plus className="size-4" />
+                      Cadastrar meta
+                    </Button>
+                  </DialogTrigger>
+                </div>
                 <div onClick={handlerUpdateReset}>
-                  <Button className="size-sm">
+                  <Button className="size-sm h-[40px] w-[130px] text-xs">
                     <CircleDotDashed className="size-4" />
                     Alterar uma meta
                   </Button>
                 </div>
                 <div onClick={handlerManuelReset}>
-                  <Button className="size-sm">
+                  <Button className="size-sm h-[40px] w-[130px] text-xs">
                     <BotOff className="size-4" />
                     Controle manual
                   </Button>
                 </div>
                 <div onClick={handlerDeletarReset}>
-                  <Button className="size-sm">
+                  <Button className="size-sm h-[40px] w-[130px] text-xs">
                     <Trash2 className="size-4" />
                     Deletar meta
                   </Button>
                 </div>
               </div>
             </div>
+          ) : (
+            <Button
+              className="size-sm h-[40px] w-[130px]"
+              onClick={handlerChosenReset}
+            >
+              <Component className="size-4" />
+              Opções
+            </Button>
           )}
 
           {ManuelGoal && (
-            <div className="flex flex-col gap-1">
-                <Button className="size-sm">
-                  <BotOff className="size-4" />
-                  Controle manual
-                </Button>
-                <div className="absolute top-[90px] max-h-screen w-[160px] overflow-y-auto rounded-lg bg-zinc-900">
-                <div className="flex flex-col gap-3 p-1">
-                  <input
-                    type="text"
-                    className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
-                    placeholder="title"
-                    onChange={(e) =>
-                      setManueldata({ ...Manueldata, title: e.target.value })
-                    }
-                  />
-                  <input
-                    type="text"
-                    className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
-                    placeholder="2024/09/19-14:42:16"
-                    onChange={(e) =>
-                      setManueldata({ ...Manueldata, date: e.target.value })
-                    }
-                  />
-                  <input
-                    type="text"
-                    className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
-                    placeholder="frequency"
-                    onChange={(e) =>
-                      setManueldata({
-                        ...Manueldata,
-                        frequency: parseInt(e.target.value), // Converte a string para número
-                      })
-                    }
-                  />
-                  <button
-                    onClick={() =>
-                      handlerManuel(
-                        Manueldata.title,
-                        Manuel.date,
-                        Manueldata.frequency
-                      )
-                    }
-                    className="w-full rounded-lg border-none bg-purple-500/70 p-2 text-white focus:outline-none"
-                  >
-                    Alterar
-                  </button>
+            <div className="absolute top-[90px] max-h-screen w-[130px] translate-x-[32px] overflow-y-auto rounded-lg bg-zinc-900">
+              <div className="flex flex-col gap-3 p-1">
+                <div
+                  onClick={handlerManuelOption1}
+                  className="w-full cursor-pointer rounded-lg border-none bg-zinc-800/70 p-2 text-center text-white hover:bg-zinc-700/80 focus:outline-none"
+                >
+                  Goals
                 </div>
+                <div
+                  onClick={handlerManuelOption2}
+                  className="w-full cursor-pointer rounded-lg border-none bg-zinc-800/70 p-2 text-center text-white hover:bg-zinc-700/80 focus:outline-none"
+                >
+                  Completed
+                </div>
+              </div>
+            </div>
+          )}
+
+          {ManuelGoal2 && (
+            <div className="absolute top-[90px] max-h-screen w-[130px] translate-x-[32px] overflow-y-auto rounded-lg bg-zinc-900">
+              <div className="flex flex-col gap-3 p-1">
+                <input
+                  type="text"
+                  className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
+                  placeholder="title"
+                  onChange={(e) =>
+                    setManueldata({ ...Manueldata, title: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white placeholder:text-xs focus:outline-none"
+                  placeholder="2024/09/19-14:42:16"
+                  onChange={(e) =>
+                    setManueldata({ ...Manueldata, date: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
+                  placeholder="frequency"
+                  onChange={(e) =>
+                    setManueldata({
+                      ...Manueldata,
+                      frequency: parseInt(e.target.value), // Converte a string para número
+                    })
+                  }
+                />
+                <button
+                  onClick={() =>
+                    handlerManuel(
+                      Manueldata.title,
+                      Manueldata.date,
+                      Manueldata.frequency,
+                    )
+                  }
+                  className="w-full rounded-lg border-none bg-purple-500/70 p-2 text-white focus:outline-none"
+                >
+                  Alterar
+                </button>
+              </div>
+            </div>
+          )}
+          {ManuelGoal3 && (
+            <div className="absolute top-[90px] max-h-screen w-[130px] translate-x-[32px] overflow-y-auto rounded-lg bg-zinc-900">
+              <div className="flex flex-col gap-3 p-1">
+                <input
+                  type="text"
+                  className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
+                  placeholder="title"
+                  onChange={(e) =>
+                    setManueldata2({ ...Manueldata2, title: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white placeholder:text-xs focus:outline-none"
+                  placeholder="2024/09/19-14:42:16"
+                  onChange={(e) =>
+                    setManueldata2({ ...Manueldata2, date: e.target.value })
+                  }
+                />
+                <button
+                  onClick={() =>
+                    handlerManuel2(Manueldata2.title, Manueldata2.date)
+                  }
+                  className="w-full rounded-lg border-none bg-purple-500/70 p-2 text-white focus:outline-none"
+                >
+                  Alterar
+                </button>
               </div>
             </div>
           )}
 
           {UpdateGoal && (
-            <div className="flex flex-col gap-1">
-              <Button className="size-sm">
-                <CircleDotDashed className="size-4" />
-                Alterar uma meta
-              </Button>
-              <div className="absolute top-[90px] max-h-screen w-[160px] overflow-y-auto rounded-lg bg-zinc-900">
-                <div className="flex flex-col">
-                  {goals.map((goal) => (
-                    <div
-                      key={goal.id}
-                      className={`justfy-center w-[calc(100% /${goal.title.length})] flex h-full cursor-pointer items-center p-2 hover:bg-zinc-800`}
-                      onClick={() => handlerUpdate(goal.id)}
-                    >
-                      {'-| '}
-                      {goal.title}
-                    </div>
-                  ))}
-                </div>
+            <div className="absolute top-[95px] max-h-screen w-[130px] translate-x-[32px] overflow-y-auto rounded-lg bg-zinc-900">
+              <div className="flex flex-col">
+                {goals.map((goal) => (
+                  <div
+                    key={goal.id}
+                    className={`justfy-center w-[calc(100% /${goal.title.length})] flex h-full cursor-pointer items-center p-2 hover:bg-zinc-800`}
+                    onClick={() => handlerUpdate(goal.id)}
+                  >
+                    {'-| '}
+                    {goal.title}
+                  </div>
+                ))}
               </div>
             </div>
           )}
           {UpdateChosen && (
-            <div className="flex flex-col gap-1">
-              <DialogTrigger asChild>
-                <Button className="size-sm">
-                  <CircleDotDashed className="size-4" />
-                  Alterar uma meta
-                </Button>
-              </DialogTrigger>
-              <div className="absolute top-[90px] max-h-screen w-[160px] overflow-y-auto rounded-lg bg-zinc-900">
-                <div className="flex flex-col gap-3 p-1">
-                  <input
-                    type="text"
-                    className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
-                    value={UpdateData.title || ''}
-                    onChange={(e) =>
-                      setUpdateData({ ...UpdateData, title: e.target.value })
-                    }
-                  />
-                  <input
-                    type="text"
-                    className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
-                    value={UpdateData.frequency || ''}
-                    onChange={(e) =>
-                      setUpdateData({
-                        ...UpdateData,
-                        frequency: parseInt(e.target.value), // Converte a string para número
-                      })
-                    }
-                  />
-                  <button
-                    onClick={() =>
-                      handlerUpdateGoalResult(
-                        UpdateData.id,
-                        UpdateData.title,
-                        UpdateData.frequency,
-                      )
-                    }
-                    className="w-full rounded-lg border-none bg-purple-500/70 p-2 text-white focus:outline-none"
-                  >
-                    Alterar
-                  </button>
-                </div>
+            <div className="absolute top-[90px] max-h-screen w-[130px] translate-x-[32px] overflow-y-auto rounded-lg bg-zinc-900">
+              <div className="flex flex-col gap-3 p-1">
+                <input
+                  type="text"
+                  className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
+                  value={UpdateData.title || ''}
+                  onChange={(e) =>
+                    setUpdateData({ ...UpdateData, title: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  className="w-full rounded-lg border-none bg-zinc-800/70 p-2 text-white focus:outline-none"
+                  value={UpdateData.frequency || ''}
+                  onChange={(e) =>
+                    setUpdateData({
+                      ...UpdateData,
+                      frequency: parseInt(e.target.value), // Converte a string para número
+                    })
+                  }
+                />
+                <button
+                  onClick={() =>
+                    handlerUpdateGoalResult(
+                      UpdateData.id,
+                      UpdateData.title,
+                      UpdateData.frequency,
+                    )
+                  }
+                  className="w-full rounded-lg border-none bg-purple-500/70 p-2 text-white focus:outline-none"
+                >
+                  Alterar
+                </button>
               </div>
             </div>
           )}
 
           {isDeleteGoalBtnOpen && (
-            <div className="flex flex-col gap-1">
-              <DialogTrigger asChild>
-                <Button className="size-sm">
-                  <Trash2 className="size-4" />
-                  Deletar meta
-                </Button>
-              </DialogTrigger>
-              <div className="absolute top-[90px] max-h-screen w-[132px] overflow-y-auto rounded-lg bg-zinc-900">
-                <div className="flex flex-col">
-                  {goals.map((goal) => (
-                    <div
-                      key={goal.id}
-                      className={`justfy-center w-[calc(100% /${goal.title.length})] flex h-full cursor-pointer items-center p-2 hover:bg-zinc-800`}
-                      onClick={() => handlerDeleteGoalById(goal.id)}
-                    >
-                      {'-| '}
-                      {goal.title}
-                    </div>
-                  ))}
-                </div>
+            <div className="absolute top-[90px] max-h-screen w-[132px] translate-x-[32px] overflow-y-auto rounded-lg bg-zinc-900">
+              <div className="flex flex-col">
+                {goals.map((goal) => (
+                  <div
+                    key={goal.id}
+                    className={`justfy-center w-[calc(100% /${goal.title.length})] flex h-full cursor-pointer items-center p-2 hover:bg-zinc-800`}
+                    onClick={() => handlerDeleteGoalById(goal.id)}
+                  >
+                    {'-| '}
+                    {goal.title}
+                  </div>
+                ))}
               </div>
             </div>
           )}

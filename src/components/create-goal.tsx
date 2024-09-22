@@ -13,7 +13,7 @@ import {
   RadioGroupIndicator,
   RadioGroupItem,
 } from './ui/radio-group'
-import { DataCreateType } from '@/types/dataCreate'
+import type { DataCreateType } from '@/types/dataCreate'
 
 interface CreateGoalProps {
   dataCreate: DataCreateType
@@ -27,7 +27,7 @@ export function CreateGoal({
   handlerCreateGoal,
 }: CreateGoalProps) {
   const handlerUpdateFrequency = (value: string) => {
-    handlerUpdateData('frequency', parseInt(value, 10)) // Convertendo para número
+    handlerUpdateData('frequency', Number.parseInt(value, 10)) // Convertendo para número
   }
 
   return (

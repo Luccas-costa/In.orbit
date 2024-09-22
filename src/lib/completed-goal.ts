@@ -11,6 +11,7 @@ export async function CompletedGoal({
 }) {
   try {
     console.log('Enviando dados para o banco de dados...')
+    console.log(idGoal, dateCompleted)
     await sql`INSERT INTO inorbit_completed (id_goal, date_completed) VALUES (${idGoal}, ${dateCompleted})`
     console.log('Enviado com sucesso!')
   } catch (error) {
