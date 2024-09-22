@@ -264,7 +264,7 @@ export function Summary({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <InOrbitIcon />
-          <span className="text-lg font-semibold">5 a 10 de agosto</span>
+          <span className="text-lg font-semibold">in.orbit</span>
         </div>
 
         <div className="flex items-center gap-2">
