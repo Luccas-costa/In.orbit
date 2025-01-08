@@ -1,22 +1,34 @@
 import React from 'react'
 import { Separator } from './ui/separator'
 import { ArrowLeft } from '@phosphor-icons/react/dist/ssr'
+import { CompletedExercise } from '@/lib/completed-exercise'
+import { DeleteCompletedExercise } from '@/lib/delete-completed-exercise'
 
 interface ExpandedProps {
+  sigle: string
   name: string
   link: string
   serie: string
   reps: string
+  completed: boolean
   handlerUnexpand: () => void
 }
 
 export default function Expanded({
+  sigle,
   name,
   link,
   serie,
   reps,
   handlerUnexpand,
+  completed,
 }: ExpandedProps) {
+  const handlerCompletedExercise = async (sigla: string) => {
+    await CompletedExercise({ sigla, completo: true })
+  }
+  const handlerDeleteExercise = async (sigla: string) => {
+    await DeleteCompletedExercise({ sigla })
+  }
   return (
     <div className="flex flex-col gap-4">
       <div
@@ -43,26 +55,47 @@ export default function Expanded({
         />
       </div>
       <div>
-        <div className="text-xl font-medium text-zinc-400">Repetições</div>
+        <div className="text-xl font-medium text-zinc-400">Repetições:</div>
         <ul>
           <li>
             <div className="ml-2 flex h-full items-center gap-[5px] font-medium text-zinc-400">
               <div className="size-[6px] rounded-full bg-zinc-400"></div>
-              Numero de series: <span className="text-[#ec4899]">{serie}</span>
+              Numero de series:{' '}
+              <span className="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                {serie}
+              </span>
             </div>
           </li>
           <li>
             <div className="ml-2 flex h-full items-center gap-[5px] font-medium text-zinc-400">
               <div className="size-[6px] rounded-full bg-zinc-400"></div>
               Numero de repetições:{' '}
-              <span className="text-[#ec4899]">{reps}</span>
+              <span className="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                {reps}
+              </span>
+            </div>
+          </li>
+          <li>
+            <div className="ml-2 flex h-full items-center gap-[5px] font-medium text-zinc-400">
+              <div className="size-[6px] rounded-full bg-gradient-to-r from-pink-500 to-violet-500"></div>
+
+              <span className="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                Progressão de cargas
+              </span>
             </div>
           </li>
         </ul>
       </div>
       <Separator />
-      <button className="mx-auto mt-2 w-[100%] rounded-lg bg-gradient-to-r from-pink-500 to-violet-500 py-3 text-lg font-medium text-white">
-        Marcar como completo
+      <button
+        className="mx-auto mt-2 w-[100%] rounded-lg bg-gradient-to-r from-pink-500 to-violet-500 py-3 text-lg font-medium text-white"
+        onClick={() =>
+          completed
+            ? handlerDeleteExercise(sigle)
+            : handlerCompletedExercise(sigle)
+        }
+      >
+        {completed ? 'Desmarcar como completo' : 'Marcar como completo'}
       </button>
     </div>
   )
