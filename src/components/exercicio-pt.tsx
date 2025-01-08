@@ -54,14 +54,13 @@ export default function ExercicioPt({ handlerExpanded }: ExercicioPtProps) {
                 <span className="text-zinc-100">{name}</span> com{' '}
                 <span className="text-zinc-100">
                   {series} <span className="text-zinc-400">de</span> {reps}{' '}
-                  <span className="text-zinc-400">reps</span>
                 </span>
-              </span>
-              <span
-                className="cursor-pointer text-[11px] text-zinc-600 underline"
-                onClick={() => handlerExpanded(sigle)}
-              >
-                expandir
+                <span
+                  className="cursor-pointer text-[11px] text-zinc-600 underline"
+                  onClick={() => handlerExpanded(sigle)}
+                >
+                  expandir
+                </span>
               </span>
             </li>
           ))}
