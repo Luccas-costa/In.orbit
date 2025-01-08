@@ -1,154 +1,96 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { Eraser } from 'lucide-react'
 
-import dayjs from 'dayjs'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { InOrbitIcon } from '@/components/in-orbit-icon'
+import { Progress, ProgressIndicator } from '@/components/ui/progress-bar'
+import ExercicioPt from '@/components/exercicio-pt'
+import ExercicioCb from '@/components/exercicio-cb'
+import Expanded from '@/components/expanded'
 
-import { GoalType } from '@/types/goal'
-import { DataCreateType } from '@/types/dataCreate'
-import { SummaryResult2, SummaryResultType } from '@/types/summary-result'
+import { allExercises } from '@/utils/series'
 
-import { SearchGoals } from '../lib/search-goal'
-import { CompletedGoal } from '@/lib/completed-goal'
-import { CreateGoal as CreateGoaldb } from '../lib/create-goal'
+export default function Academia() {
+  const [expanded, setExpanded] = useState(true)
+  const [infoExercise, setInfoExercise] = useState({
+    name: 'Supino máquina',
+    link: 'te',
+    serie: '4',
+    reps: '12',
+  })
 
-import { Summary as Summarydb } from '@/db/summary'
-
-import Loader from '../assets/loading'
-import { Summary } from '@/components/summary'
-import { Dialog } from '@/components/ui/dialog'
-import { EmptyGoals } from '@/components/empty-goals'
-import { CreateGoal } from '../components/create-goal'
-import { SummaryGroup } from '@/db/summary-group'
-
-export default function Home() {
-  const [goals, setGoals] = useState<GoalType[]>([]) // Definindo o tipo conforme sua função
-  const [Refresh, setRefresh] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<boolean>(false)
-
-  const [completedGoals, setCompletedGoals] = useState<SummaryResultType[]>([])
-  const [completedGoalsFormated, setCompletedGoalsFormated] = useState<
-    SummaryResult2[]
-  >([])
-
-  useEffect(() => {
-    const fetchGoals = async () => {
-      setLoading(true)
-      try {
-        const data = await SearchGoals() // Chama a função SearchGoals
-        setGoals(data) // Armazena os dados no estado
-      } catch (err) {
-        console.error('Erro ao buscar objetivos:', err)
-        setError(false)
-      }
+  const handlerExpanded = (sigle: string) => {
+    const foundExercise = allExercises.find(
+      (exercise) => exercise.sigle === sigle,
+    )
+    if (foundExercise) {
+      setInfoExercise({
+        name: foundExercise.name,
+        link: foundExercise.link,
+        serie: foundExercise.series.toString(), // Convertendo `series` para string
+        reps: foundExercise.reps.toString(), // Convertendo `reps` para string
+      })
     }
-
-    const fetchCompletedGoals = async () => {
-      try {
-        setLoading(true)
-        const result = await Summarydb()
-        setCompletedGoals(result) // Define a lista de metas no estado
-      } catch (err) {
-        setError(true)
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    const fetchCompletedGoalsFormated = async () => {
-      try {
-        setLoading(true)
-        const result = await SummaryGroup()
-
-        // Filtra os resultados que não são nulos
-        const filteredResult = result.filter((item) => item !== null)
-
-        setCompletedGoalsFormated(filteredResult as SummaryResult2[]) // Define a lista de metas no estado
-      } catch (err) {
-        setError(true)
-        console.error(err)
-      }
-    }
-
-    fetchGoals() // Chama a função ao montar o componente
-    fetchCompletedGoalsFormated()
-    fetchCompletedGoals()
-  }, [Refresh])
-
-  const dataCreate = {
-    title: '',
-    frequency: 0, // Garantir que frequency seja inicializado corretamente
+    setExpanded(!expanded)
   }
 
-  const [data, setData] = useState<DataCreateType>(dataCreate)
-
-  const handlerUpdateData = (key: string, value: string | number) => {
-    setData((prev) => ({ ...prev, [key]: value }))
-  }
-
-  const getFormattedDate = () => dayjs().format('YYYY/MM/DD-HH:mm:ss')
-
-  const handlerCreateGoal = async () => {
-    if (!data.title) {
-      console.error('Title is undefined or empty')
-      return
-    }
-
-    const randomId = Math.floor(10000 + Math.random() * 90000)
-    const frequency = data.frequency // Atribuir frequency direto de data
-    const date = getFormattedDate()
-
-    await CreateGoaldb({
-      id: randomId || 1,
-      title: data.title || 'Não funcionou',
-      date: date || 'Não funcionou',
-      frequency: frequency || 1,
-    })
-    handlerrefresh(true)
-  }
-
-  const handlerCompletedGoal = async (id: number) => {
-    const date = getFormattedDate()
-    await CompletedGoal({
-      idGoal: id,
-      dateCompleted: date,
-    })
-    handlerrefresh(true)
-    console.log('Meta concluída com sucesso!')
-  }
-
-  const handlerrefresh = (
-    estado: boolean | ((prevState: boolean) => boolean),
-  ) => {
-    if (Refresh === false) {
-      setRefresh(true)
-    }
-    setRefresh(estado)
+  const handlerUnexpand = () => {
+    setExpanded(false)
   }
 
   return (
-    <div className="min-h-screen">
-      <Dialog>
-        {loading ? (
-          <Loader />
-        ) : error ? (
-          <EmptyGoals />
-        ) : (
-          <Summary
-            goals={goals}
-            handlerCompletedGoal={handlerCompletedGoal}
-            completedGoals={completedGoals}
-            completedGoalsFormated={completedGoalsFormated}
-            handlerrefresh={handlerrefresh}
+    <div className="mx-auto flex min-h-screen max-w-[480px] flex-col gap-6 px-5 py-10 transition-all">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <InOrbitIcon />
+          <span className="text-lg font-semibold">in.orbit</span>
+        </div>
+
+        <Button className="size-sm h-[40px] w-[130px] px-2 text-xs">
+          <Eraser className="size-4" />
+          Limpar semana
+        </Button>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <Progress value={8} max={15}>
+          <ProgressIndicator
+            style={{
+              width: `${Math.round((3 / 7) * 100)}%`,
+            }}
           />
+        </Progress>
+
+        <div className="flex items-center justify-between text-xs text-zinc-400">
+          <span>
+            Você realizou <span className="text-zinc-100">3</span> dos{' '}
+            <span className="text-zinc-100">7</span> treinos dessa semana.
+          </span>
+          <span>30%</span>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="flex flex-col gap-6">
+        {expanded ? (
+          <Expanded
+            handlerUnexpand={handlerUnexpand}
+            name={infoExercise.name}
+            link={infoExercise.link}
+            serie={infoExercise.serie}
+            reps={infoExercise.reps}
+          />
+        ) : (
+          <>
+            <h2 className="text-xl font-medium">Sua semana</h2>
+            <ExercicioPt handlerExpanded={handlerExpanded} />
+            <ExercicioCb handlerExpanded={handlerExpanded} />
+          </>
         )}
-        <CreateGoal
-          dataCreate={data}
-          handlerUpdateData={handlerUpdateData}
-          handlerCreateGoal={handlerCreateGoal}
-        />
-      </Dialog>
+      </div>
     </div>
   )
 }
