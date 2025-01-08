@@ -28,7 +28,7 @@ export default function Expanded({
         </span>{' '}
         {name}
       </div>
-      <div className="mx-auto h-[700px] w-[400px] rounded-md bg-red-100">
+      <div className="mx-auto h-[700px] w-[95%] overflow-hidden rounded-md bg-red-100">
         <iframe
           src={`https://www.youtube.com/embed/${link}/?mute=1&loop=1&playlist=${link}&playsinline=1`}
           allow="autoplay; encrypted-media"
