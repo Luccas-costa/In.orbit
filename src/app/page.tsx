@@ -16,6 +16,7 @@ import { DeleteCompletedExercise } from '@/lib/delete-completed-exercise'
 import { CompletedExerciseType } from '@/types/completeded-exercise'
 import { SearchCompletedExercise } from '@/lib/search-completed-exercise'
 import Loader from '@/assets/loading'
+import { DeleteAllCompletedGoals } from '@/lib/delete-all-completed-exercise'
 
 export default function Academia() {
   const [expanded, setExpanded] = useState(false)
@@ -55,8 +56,12 @@ export default function Academia() {
   const handlerCompletedExercise = async (sigla: string) => {
     await CompletedExercise({ sigla, completo: true })
   }
+
   const handlerDeleteExercise = async (sigla: string) => {
     await DeleteCompletedExercise({ sigla })
+  }
+  const handlerAllDeleteExercise = async () => {
+    await DeleteAllCompletedGoals()
   }
 
   useEffect(() => {
@@ -85,7 +90,10 @@ export default function Academia() {
               <span className="text-lg font-semibold">in.orbit</span>
             </div>
 
-            <Button className="size-sm h-[40px] w-[130px] px-2 text-xs">
+            <Button
+              className="size-sm h-[40px] w-[130px] px-2 text-xs"
+              onClick={handlerAllDeleteExercise}
+            >
               <Eraser className="size-4" />
               Limpar semana
             </Button>
