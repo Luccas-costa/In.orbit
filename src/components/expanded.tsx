@@ -61,7 +61,7 @@ export default function Expanded({
         </ul>
       </div>
       <Separator />
-      <button className="mx-auto mt-2 w-[420px] rounded-lg bg-gradient-to-r from-pink-500 to-violet-500 py-3 text-lg font-medium text-white">
+      <button className="mx-auto mt-2 w-[100%] rounded-lg bg-gradient-to-r from-pink-500 to-violet-500 py-3 text-lg font-medium text-white">
         Marcar como completo
       </button>
     </div>
